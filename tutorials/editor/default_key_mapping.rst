@@ -534,7 +534,6 @@ Property Editor
 | Paste Value        | :kbd:`Ctrl + V`         | :kbd:`Opt + V`         | ``property_editor/paste_value``        |
 +--------------------+-------------------------+------------------------+----------------------------------------+
 
-
 .. _doc_default_key_mapping_particles:
 
 Particles
