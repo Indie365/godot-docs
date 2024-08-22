@@ -132,7 +132,7 @@ To terminate networking:
 
 ::
 
-    multiplayer.multiplayer_peer = null
+    multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
 .. warning::
 
@@ -335,7 +335,7 @@ have loaded the game scene.
 
 
     func remove_multiplayer_peer():
-        multiplayer.multiplayer_peer = null
+        multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
 
     # When the server decides to start the game from a UI scene,
@@ -380,11 +380,11 @@ have loaded the game scene.
 
 
     func _on_connected_fail():
-        multiplayer.multiplayer_peer = null
+        remove_multiplayer_peer()
 
 
     func _on_server_disconnected():
-        multiplayer.multiplayer_peer = null
+        remove_multiplayer_peer()
         players.clear()
         server_disconnected.emit()
 
