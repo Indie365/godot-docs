@@ -116,12 +116,14 @@ the following line of code:
 
     #include <godot_cpp/classes/sprite2d.hpp>
 
+    using namespace godot;
+
     namespace CustomNamespace {
 
     // MySprite2D also needs to be bound in your GDExtension's register_types.cpp file.
     // More info on this in the GDExtension example setup tutorial.
-    class MySprite2D : public godot::Sprite2D {
-        GDCLASS(godot::MySprite2D, godot::Object)
+    class MySprite2D : public Sprite2D {
+        GDCLASS(MySprite2D, Sprite2D)
 
     protected:
         // _bind_methods is required for all GDCLASS's or compilation will fail!
@@ -181,9 +183,14 @@ Add the following code to your script:
 
  .. code-tab:: cpp C++
 
-    MySprite2D() {
-        godot::UtilityFunctions::print("Hello, world!");
-    }
+    // Add this include at the top of your header file.
+    #include <godot_cpp/variant/utility_functions.hpp>
+
+    // Add this inside your MySprite2D class.
+    public:
+        MySprite2D() {
+            UtilityFunctions::print("Hello, world!");
+        }
 
 
 Let's break it down. The ``func`` keyword defines a new function named
@@ -273,10 +280,10 @@ At the bottom of the script, define the function:
 
  .. code-tab:: cpp C++
 
-    void _process(const double p_delta) override {
+    void _process(double p_delta) override {
         // Note that rotation is a private member variable of Node2D, so the set_rotation function must be used.
         // You'll find that a lot of member variables that are public in gdscript/C# are instead private in GDExtension C++.
-        set_rotation(get_rotation() + (angular_speed * p_delta));
+        set_rotation(get_rotation() + angular_speed * p_delta);
     }
 
 The ``func`` keyword defines a new function. After it, we have to write the
@@ -331,7 +338,7 @@ them.
     // Note that the directional Vector2 constants do not exist in GDExtension right now. So Vector2(0, -1) must be used.
     Vector2 velocity = Vector2(0, -1).rotated(get_rotation()) * speed;
 
-    set_position(get_position() + (velocity * p_delta));
+    set_position(get_position() + velocity * p_delta);
 
 
 As we already saw, the ``var`` keyword defines a new variable. If you put it at
@@ -405,14 +412,15 @@ Here is the complete ``sprite_2d.gd`` file for reference.
     #ifndef MY_SPRITE_2D_H
     #define MY_SPRITE_2D_H
 
-    #include <godot_cpp/variant/utility_functions.hpp>
     #include <godot_cpp/classes/sprite2d.hpp>
     #include <godot_cpp/core/math.hpp>
+
+    using namespace godot;
 
     namespace CustomNamespace {
 
     class MySprite2D : public Sprite2D {
-        GDCLASS(MySprite2D, godot::Object)
+        GDCLASS(MySprite2D, Sprite2D)
 
         int speed = 400;
         float angular_speed = Math_PI;
@@ -421,15 +429,13 @@ Here is the complete ``sprite_2d.gd`` file for reference.
         static void _bind_methods() {}
 
     public:
-        MySprite2D() {
-            godot::UtilityFunctions::print("Hello, world!");
-        }
+        MySprite2D() {}
 
-        void _process(const double p_delta) override {
-            set_rotation(get_rotation() + (angular_speed * delta));
+        void _process(double p_delta) override {
+            set_rotation(get_rotation() + angular_speed * p_delta);
 
             Vector2 velocity = Vector2(0, -1).rotated(get_rotation()) * speed;
-            set_position(get_position() + (velocity * delta));
+            set_position(get_position() + velocity * p_delta);
         }
     };
 
