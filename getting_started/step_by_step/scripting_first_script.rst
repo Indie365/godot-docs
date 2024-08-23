@@ -30,6 +30,8 @@ The equivalent C# code has been included in another tab for convenience.
 
 .. seealso:: To learn more about C#, head to the :ref:`C# basics <doc_c_sharp>` page.
 
+.. seealso:: To learn more about GDExtension C++, head to the :ref:`What is GDExtension? <doc_what_is_gdextension>` page.
+
 Project setup
 -------------
 
@@ -107,26 +109,31 @@ the following line of code:
     {
     }
 
-  .. code-tab:: GDExtension C++
+ .. code-tab:: cpp C++
 
     #ifndef MY_SPRITE_2D_H
     #define MY_SPRITE_2D_H
 
     #include <godot_cpp/classes/sprite2d.hpp>
 
-    // MySprite2D would need to be bound in your GDExtensions register_types.cpp file.
+    namespace CustomNamespace {
+
+    // MySprite2D also needs to be bound in your GDExtension's register_types.cpp file.
     // More info on this in the GDExtension example setup tutorial.
     class MySprite2D : public godot::Sprite2D {
-        GDCLASS(godot::MySprite2D, godot::Object);
+        GDCLASS(godot::MySprite2D, godot::Object)
 
     protected:
-        static void _bind_methods() {}  // _bind_methods is required for all GDCLASS's or compilation will fail!
+        // _bind_methods is required for all GDCLASS's or compilation will fail!
+        static void _bind_methods() {}
 
     public:
-        // Empty default constructor is required or compilation will fail!
-        // GDExtension constructors also are not allowed to have additional parameters or compilation will fail!
+        // Default constructor with no parameters is required or compilation will fail!
         MySprite2D() {}
     };
+
+    } // CustomNamespace
+
     #endif // MY_SPRITE_2D_H
 
 Every GDScript file is implicitly a class. The ``extends`` keyword defines the
@@ -172,7 +179,7 @@ Add the following code to your script:
         GD.Print("Hello, world!");
     }
 
- .. code-tab:: GDExtension C++
+ .. code-tab:: cpp C++
 
     MySprite2D() {
         godot::UtilityFunctions::print("Hello, world!");
@@ -216,7 +223,7 @@ angular speed in radians per second.  Add the following after the ``extends Spri
     private int _speed = 400;
     private float _angularSpeed = Mathf.Pi;
 
- .. code-tab:: GDExtension C++
+ .. code-tab:: cpp C++
 
     int speed = 400;
     float angular_speed = Math_PI;
@@ -264,10 +271,10 @@ At the bottom of the script, define the function:
         Rotation += _angularSpeed * (float)delta;
     }
 
- .. code-tab:: GDExtension C++
+ .. code-tab:: cpp C++
 
     void _process(const double p_delta) override {
-        // Note that ``rotation`` is a private member variable of  Node2D so the ``set_rotation`` function must be used.
+        // Note that rotation is a private member variable of Node2D, so the set_rotation function must be used.
         // You'll find that a lot of member variables that are public in gdscript/C# are instead private in GDExtension C++.
         set_rotation(get_rotation() + (angular_speed * p_delta));
     }
@@ -319,7 +326,7 @@ them.
 
     Position += velocity * (float)delta;
 
- .. code-tab:: GDExtension C++
+ .. code-tab:: cpp C++
 
     // Note that the directional Vector2 constants do not exist in GDExtension right now. So Vector2(0, -1) must be used.
     Vector2 velocity = Vector2(0, -1).rotated(get_rotation()) * speed;
@@ -393,17 +400,19 @@ Here is the complete ``sprite_2d.gd`` file for reference.
         }
     }
  
-  .. code-tab:: GDExtension C++
+ .. code-tab:: cpp C++
 
     #ifndef MY_SPRITE_2D_H
     #define MY_SPRITE_2D_H
 
-    #include "godot_cpp/variant/utility_functions.hpp"
+    #include <godot_cpp/variant/utility_functions.hpp>
     #include <godot_cpp/classes/sprite2d.hpp>
     #include <godot_cpp/core/math.hpp>
 
+    namespace CustomNamespace {
+
     class MySprite2D : public Sprite2D {
-        GDCLASS(MySprite2D, godot::Object);
+        GDCLASS(MySprite2D, godot::Object)
 
         int speed = 400;
         float angular_speed = Math_PI;
@@ -423,4 +432,7 @@ Here is the complete ``sprite_2d.gd`` file for reference.
             set_position(get_position() + (velocity * delta));
         }
     };
+
+    } // CustomNamespace
+
     #endif // MY_SPRITE_2D_H
