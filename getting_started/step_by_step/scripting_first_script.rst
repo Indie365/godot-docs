@@ -107,6 +107,28 @@ the following line of code:
     {
     }
 
+  .. code-tab:: GDExtension C++
+
+    #ifndef MY_SPRITE_2D_H
+    #define MY_SPRITE_2D_H
+
+    #include <godot_cpp/classes/sprite2d.hpp>
+
+    // MySprite2D would need to be bound in your GDExtensions register_types.cpp file.
+    // More info on this in the GDExtension example setup tutorial.
+    class MySprite2D : public godot::Sprite2D {
+        GDCLASS(godot::MySprite2D, godot::Object);
+
+    protected:
+        static void _bind_methods() {}  // _bind_methods is required for all GDCLASS's or compilation will fail!
+
+    public:
+        // Empty default constructor is required or compilation will fail!
+        // GDExtension constructors also are not allowed to have additional parameters or compilation will fail!
+        MySprite2D() {}
+    };
+    #endif // MY_SPRITE_2D_H
+
 Every GDScript file is implicitly a class. The ``extends`` keyword defines the
 class this script inherits or extends. In this case, it's ``Sprite2D``, meaning
 our script will get access to all the properties and functions of the Sprite2D
@@ -150,6 +172,12 @@ Add the following code to your script:
         GD.Print("Hello, world!");
     }
 
+ .. code-tab:: GDExtension C++
+
+    MySprite2D() {
+        godot::UtilityFunctions::print("Hello, world!");
+    }
+
 
 Let's break it down. The ``func`` keyword defines a new function named
 ``_init``. This is a special name for our class's constructor. The engine calls
@@ -187,6 +215,11 @@ angular speed in radians per second.  Add the following after the ``extends Spri
 
     private int _speed = 400;
     private float _angularSpeed = Mathf.Pi;
+
+ .. code-tab:: GDExtension C++
+
+    int speed = 400;
+    float angular_speed = Math_PI;
 
 Member variables sit near the top of the script, after any "extends" lines,
 but before functions. Every node
@@ -229,6 +262,14 @@ At the bottom of the script, define the function:
     public override void _Process(double delta)
     {
         Rotation += _angularSpeed * (float)delta;
+    }
+
+ .. code-tab:: GDExtension C++
+
+    void _process(const double p_delta) override {
+        // Note that ``rotation`` is a private member variable of  Node2D so the ``set_rotation`` function must be used.
+        // You'll find that a lot of member variables that are public in gdscript/C# are instead private in GDExtension C++.
+        set_rotation(get_rotation() + (angular_speed * p_delta));
     }
 
 The ``func`` keyword defines a new function. After it, we have to write the
@@ -277,6 +318,14 @@ them.
     var velocity = Vector2.Up.Rotated(Rotation) * _speed;
 
     Position += velocity * (float)delta;
+
+ .. code-tab:: GDExtension C++
+
+    // Note that the directional Vector2 constants do not exist in GDExtension right now. So Vector2(0, -1) must be used.
+    Vector2 velocity = Vector2(0, -1).rotated(get_rotation()) * speed;
+
+    set_position(get_position() + (velocity * p_delta));
+
 
 As we already saw, the ``var`` keyword defines a new variable. If you put it at
 the top of the script, it defines a property of the class. Inside a function, it
@@ -343,3 +392,35 @@ Here is the complete ``sprite_2d.gd`` file for reference.
             Position += velocity * (float)delta;
         }
     }
+ 
+  .. code-tab:: GDExtension C++
+
+    #ifndef MY_SPRITE_2D_H
+    #define MY_SPRITE_2D_H
+
+    #include "godot_cpp/variant/utility_functions.hpp"
+    #include <godot_cpp/classes/sprite2d.hpp>
+    #include <godot_cpp/core/math.hpp>
+
+    class MySprite2D : public Sprite2D {
+        GDCLASS(MySprite2D, godot::Object);
+
+        int speed = 400;
+        float angular_speed = Math_PI;
+
+    protected:
+        static void _bind_methods() {}
+
+    public:
+        MySprite2D() {
+            godot::UtilityFunctions::print("Hello, world!");
+        }
+
+        void _process(const double p_delta) override {
+            set_rotation(get_rotation() + (angular_speed * delta));
+
+            Vector2 velocity = Vector2(0, -1).rotated(get_rotation()) * speed;
+            set_position(get_position() + (velocity * delta));
+        }
+    };
+    #endif // MY_SPRITE_2D_H
