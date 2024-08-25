@@ -109,7 +109,7 @@ Comment out the lines ``var velocity = Vector2.UP.rotated(rotation) * speed`` an
 
  .. code-tab:: cpp C++
 
-    // Vector2 velocity = Vector2(0, -1).rotated(get_rotation()) * speed;
+    //Vector2 velocity = Vector2(0, -1).rotated(get_rotation()) * speed;
 
     // set_position(get_position() + velocity * p_delta);
 
