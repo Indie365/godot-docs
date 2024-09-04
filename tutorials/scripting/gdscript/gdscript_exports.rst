@@ -244,9 +244,15 @@ Therefore, if you specify an extension of Resource such as:
 The drop-down menu will be limited to AnimationNode and all
 its derived classes.
 
-It must be noted that even if the script is not being run while in the
-editor, the exported properties are still editable. This can be used
-in conjunction with a :ref:`script in "tool" mode <doc_gdscript_tool_mode>`.
+One consideration in using ``@export`` variables for classes that 
+derive from :ref:`Resource <class_Resource>` is that it loads the
+resource when the instance of the script is loaded. This is often
+desirable as you'll likely want to use that resource directly in
+your script. However, if the resource in question is a large
+resource commonly loaded during a game's loading screen (like a
+:ref:`PackedScene <class_PackedScene>` containing a whole level),
+it may be desirable to use ``@export_file`` so you have the file
+path to the resource file and can load it manually when you need it.
 
 Exporting bit flags
 -------------------
